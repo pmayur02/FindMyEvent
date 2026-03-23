@@ -1,0 +1,21 @@
+{
+    "isExist":"select 1 from Users where email =? ; ",
+    "registerUser":"insert into Users(name,email,password,created_at) values (?,?,?,now())",
+    "fetchUserByEmailId":"select id, name, email, password from Users where email = ? ;",
+    "fetchUserById":"select id, name,email from Users where id = ? ;",
+    "fetchAllUsers": "select id, name,email from Users;",
+    "updateUsersData": "update Users set {expr};",
+    "deleteUser":"delete from Users where id = ?",
+    "createEvent":"insert into Events (title, description, event_date, event_time, total_capacity, remaining_tickets, created_by, created_at) values (?,?,STR_TO_DATE(?, '%d-%m-%Y'),?,?,?,?,now());",
+    "fetchAllEvents":"select id,title,description,DATE_FORMAT(event_date, '%d-%m-%Y') as event_date,event_time,total_capacity,remaining_tickets from Events;",
+    "fetchEvent": "select id,title,description,DATE_FORMAT(event_date, '%d-%m-%Y') as event_date,event_time,total_capacity,remaining_tickets, created_by from Events where id = ?;",
+    "updateEvent":"update Events set {expr} where id = ?;",
+    "deleteEvent":"delete from Events where id = ?;",
+    "bookTicket":"insert into Bookings(ticket_id,user_id,event_id,no_of_tickets,booking_date) values (?,?,?,?,now());",
+    "updateTicketCount":"update Events set remaining_tickets = ? where id=?;",
+    "fetchBookedTicket":"select * from Bookings where id = ?;",
+    "myBookedTickets":"select e.title as title, DATE_FORMAT(e.event_date, '%d-%m-%Y') as event_date, e.event_time as event_time, b.ticket_id as ticket_id, b.no_of_tickets as number_of_tickets from Events e inner join Bookings b on e.id = b.event_id where b.user_id = ?",
+    "fetchTicketByTicketId":"select e.title as title, e.id as event_id ,DATE_FORMAT(e.event_date, '%d-%m-%Y') as event_date, e.event_time as event_time, b.ticket_id as ticket_id, b.no_of_tickets as number_of_tickets from Events e inner join Bookings b on e.id = b.event_id where b.ticket_id = ?",
+    "insertAttendance":"insert into Event_Attendance(user_id,event_id,ticket_id,entry_time) values (?,?,?,now());",
+    "getUpcomingEvents":"SELECT id,title,description,DATE_FORMAT(event_date, '%d-%m-%Y') as event_date,event_time,total_capacity,remaining_tickets FROM Events WHERE TIMESTAMP(event_date, event_time) >= NOW();"
+}

@@ -1,0 +1,1543 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Find My Event",
+    "description": "Event Management Platform API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your JWT token. You can get it from /users/login or /users/register"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "example": "123456"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Updated"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "johnupdated@example.com"
+          }
+        }
+      },
+      "UserObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          }
+        }
+      },
+      "UserDetailsObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00.000Z"
+          }
+        }
+      },
+      "UserDetailsArray": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "example": 1
+            },
+            "name": {
+              "type": "string",
+              "example": "John Doe"
+            },
+            "email": {
+              "type": "string",
+              "example": "john@example.com"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-01-15T10:30:00.000Z"
+            }
+          }
+        }
+      },
+      "EventRegister": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "event_date",
+          "event_time",
+          "total_capacity"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Dance Show"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is a dance show"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-03-20"
+          },
+          "event_time": {
+            "type": "string",
+            "format": "time",
+            "example": "15:00"
+          },
+          "total_capacity": {
+            "type": "integer",
+            "example": 100
+          }
+        }
+      },
+      "EventObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Dance Show"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is a dance show"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-03-20"
+          },
+          "event_time": {
+            "type": "string",
+            "format": "time",
+            "example": "15:00:00"
+          },
+          "total_capacity": {
+            "type": "integer",
+            "example": 100
+          },
+          "remaining_tickets": {
+            "type": "integer",
+            "example": 80
+          }
+        }
+      },
+      "EventDetailsArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/EventObject"
+        }
+      },
+      "UpdateEventRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Dance Show Updated"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is an updated dance show"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-03-20"
+          },
+          "event_time": {
+            "type": "string",
+            "format": "time",
+            "example": "15:00:00"
+          },
+          "total_capacity": {
+            "type": "integer",
+            "example": 100
+          },
+          "remaining_tickets": {
+            "type": "integer",
+            "example": 80
+          }
+        }
+      },
+      "BookTicket": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "noOfTicket"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "integer",
+            "example": 1
+          },
+          "noOfTicket": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "AuthSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserObject"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Error message here"
+          }
+        }
+      },
+      "SuccessMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          }
+        }
+      },
+      "TicketObject": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Dance Show"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-20T18:30:00.000Z"
+          },
+          "event_time": {
+            "type": "string",
+            "format": "time",
+            "example": "15:00:00"
+          },
+          "ticket_id": {
+            "type": "string",
+            "example": "6ATQppWaVgfkFQtXm9mR"
+          },
+          "number_of_tickets": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "TicketHistoryArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TicketObject"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/users/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a new user account. Returns a JWT token on success.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSuccessResponse"
+                },
+                "example": {
+                  "message": "User registered successfully",
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "user": {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "All fields are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "All fields are required"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Email already registered"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login a user",
+        "description": "Authenticates a user with email and password. Returns a JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSuccessResponse"
+                },
+                "example": {
+                  "message": "Login successful",
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "user": {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "All fields are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Invalid email or password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/user-profile": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Get user profile",
+        "description": "Returns the authenticated user's profile information.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/UserDetailsObject"
+                    }
+                  }
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john@example.com",
+                    "created_at": "2024-01-15T10:30:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/users-details": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Get all users details",
+        "description": "Returns all users' details information.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All users details fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "$ref": "#/components/schemas/UserDetailsArray"
+                    }
+                  }
+                },
+                "example": {
+                  "users": [
+                    {
+                      "id": 1,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "created_at": "2024-01-15T10:30:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Users not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/update-user/{id}": {
+      "patch": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update user profile",
+        "description": "Updates the user's name and/or email.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserObject"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Profile updated successfully",
+                  "user": {
+                    "id": 1,
+                    "name": "John Updated",
+                    "email": "johnupdated@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Name and email are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already in use",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Email already in use"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/remove-user/{id}": {
+      "delete": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Delete user account",
+        "description": "Permanently deletes the user's account from the database.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                },
+                "example": {
+                  "message": "Account deleted successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/create-event": {
+      "post": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Create a new event",
+        "description": "Creates a new event with title, description, date, time, and capacity.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventRegister"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "$ref": "#/components/schemas/EventObject"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Event created successfully",
+                  "event": {
+                    "id": 1,
+                    "title": "Dance Show",
+                    "description": "This is a dance show",
+                    "event_date": "2026-03-20",
+                    "event_time": "15:00:00",
+                    "total_capacity": 100,
+                    "remaining_tickets": 100
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "All fields are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "All fields are required"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/fetch-events": {
+      "get": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Get all events",
+        "description": "Returns all events details.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All events fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "$ref": "#/components/schemas/EventDetailsArray"
+                    }
+                  }
+                },
+                "example": {
+                  "events": [
+                    {
+                      "id": 1,
+                      "title": "Dance Show",
+                      "description": "This is a dance show",
+                      "event_date": "2026-03-20",
+                      "event_time": "15:00:00",
+                      "total_capacity": 100,
+                      "remaining_tickets": 80
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Events not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/fetch-event/{id}": {
+      "get": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Get event by ID",
+        "description": "Returns details of a specific event.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Event ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "event": {
+                      "$ref": "#/components/schemas/EventObject"
+                    }
+                  }
+                },
+                "example": {
+                  "event": {
+                    "id": 1,
+                    "title": "Dance Show",
+                    "description": "This is a dance show",
+                    "event_date": "2026-03-20",
+                    "event_time": "15:00:00",
+                    "total_capacity": 100,
+                    "remaining_tickets": 80
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/update-event/{id}": {
+      "patch": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Update event information",
+        "description": "Updates the event's details.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the event",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "$ref": "#/components/schemas/EventObject"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Event updated successfully",
+                  "event": {
+                    "id": 1,
+                    "title": "Dance Show Updated",
+                    "description": "This is an updated dance show",
+                    "event_date": "2026-03-20",
+                    "event_time": "15:00:00",
+                    "total_capacity": 100,
+                    "remaining_tickets": 80
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/remove-event/{id}": {
+      "delete": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Delete event",
+        "description": "Permanently deletes an event from the database.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Event ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                },
+                "example": {
+                  "message": "Event deleted successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/book-ticket": {
+      "post": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Book tickets for an event",
+        "description": "Books one or more tickets for a specified event.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookTicket"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ticket_id": {
+                          "type": "string"
+                        },
+                        "event_id": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Ticket booked successfully",
+                  "data": {
+                    "ticket_id": "6ATQppWaVgfkFQtXm9mR",
+                    "event_id": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "All fields are required or insufficient tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "All fields are required"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/mytickets": {
+      "get": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Get user's ticket history",
+        "description": "Returns all tickets booked by the authenticated user.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket history fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tickets": {
+                      "$ref": "#/components/schemas/TicketHistoryArray"
+                    }
+                  }
+                },
+                "example": {
+                  "tickets": [
+                    {
+                      "title": "Dance Show",
+                      "event_date": "2026-03-22T18:30:00.000Z",
+                      "event_time": "15:00:00",
+                      "ticket_id": "6ATQppWaVgfkFQtXm9mR",
+                      "number_of_tickets": 2
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No tickets found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/mark-attendance/{ticketId}": {
+      "get": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Mark attendance",
+        "description": "Marks attendance for a specific ticket.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "description": "Ticket ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attendance marked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                },
+                "example": {
+                  "message": "Attendance marked successfully!"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/upcoming-events": {
+      "get": {
+        "tags": [
+          "EventManagement"
+        ],
+        "summary": "Get upcoming events",
+        "description": "Returns all upcoming events (public endpoint, no authentication required).",
+        "responses": {
+          "200": {
+            "description": "All upcoming events fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "$ref": "#/components/schemas/EventDetailsArray"
+                    }
+                  }
+                },
+                "example": {
+                  "events": [
+                    {
+                      "id": 1,
+                      "title": "Dance Show",
+                      "description": "This is a dance show",
+                      "event_date": "2026-03-20",
+                      "event_time": "15:00:00",
+                      "total_capacity": 100,
+                      "remaining_tickets": 80
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Events not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication and user management endpoints"
+    },
+    {
+      "name": "EventManagement",
+      "description": "Event management endpoints - create, view, update, delete events and book tickets"
+    }
+  ]
+}
