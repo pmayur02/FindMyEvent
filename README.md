@@ -350,19 +350,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "message": "Error description here"
 }
 ```
-
-### Common HTTP Status Codes
-
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation errors)
-- `401` - Unauthorized (invalid/missing token)
-- `404` - Not Found
-- `409` - Conflict (email already exists)
-- `500` - Internal Server Error
-
-
-
 ## API Documentation (Swagger)
 
 Once the server is running, access the interactive API documentation at:
