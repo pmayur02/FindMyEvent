@@ -199,19 +199,28 @@ module.exports.deleteEvent = async (eventId,userId) => {
 }
 
 
-module.exports.bookTicket = async(userId,payload) =>{
+module.exports.bookTicket = async(userId, payload) => {
     try {
+
+        const connection = await db.getConnection();
+        
         const {eventId, noOfTicket} = payload;
 
         if(!eventId || !noOfTicket || !userId){
             return {
-                status:400,
-                message:"Missing Fields - eventId or noOfTickets or userId "
+                status: 400,
+                message: "Missing Fields - eventId or noOfTickets or userId "
             }
         }
 
-        let event = await db.query(queries.fetchEvent,[eventId]);
-        if(!event || event[0].length===0){
+        // start transaction
+        await connection.beginTransaction();
+
+        let event = await connection.query(queries.fetchEvent + ' FOR UPDATE', [eventId]); // for update to lock the event row for other transaction
+        
+        if(!event || event[0].length === 0){
+            await connection.rollback();
+            connection.release();
             return {
                 status: 404,
                 message: "No Event Found",
@@ -222,31 +231,39 @@ module.exports.bookTicket = async(userId,payload) =>{
 
         const isExpired = isEventExpired({event_date: event.event_date, event_time: event.event_time});
         if(isExpired){
+            await connection.rollback();
+            connection.release();
             return{
-                status:400,
-                message:"Event already expired"
+                status: 400,
+                message: "Event already expired"
             }
         }
 
         if(noOfTicket > 10){
+            await connection.rollback();
+            connection.release();
             return{
-                status:400,
-                message:"You can book upto 10 tickets"
+                status: 400,
+                message: "You can book upto 10 tickets"
             }
         }
 
         let availableTickets = event.remaining_tickets;
         if(availableTickets <= 0){
+            await connection.rollback();
+            connection.release();
             return{
-                status:400,
-                message:"No Tickets Available"
+                status: 400,
+                message: "No Tickets Available"
             }
         }
 
         if(availableTickets < noOfTicket){
+            await connection.rollback();
+            connection.release();
             return{
-                status:400,
-                message:`Cannot Book ${noOfTicket} number of tickets only ${availableTickets} tickets are available.`
+                status: 400,
+                message: `Cannot Book ${noOfTicket} number of tickets only ${availableTickets} tickets are available.`
             }
         }
 
@@ -256,29 +273,39 @@ module.exports.bookTicket = async(userId,payload) =>{
 
         const ticketNo = generateTicketNo();
 
-        const bookingStatus = await Promise.allSettled([await db.query(queries.bookTicket,[ticketNo,userId,eventId,noOfTicket]),
-        await db.query(queries.updateTicketCount,[availableTickets,eventId])])
+        const bookingStatus = await Promise.allSettled([
+            await connection.query(queries.bookTicket, [ticketNo, userId, eventId, noOfTicket]),
+            await connection.query(queries.updateTicketCount, [availableTickets, eventId])
+        ]);
+  
+        const insertId = bookingStatus[0].value[0].insertId;
+        const bookingDetails = await connection.query(queries.fetchBookedTicket, [insertId]);
 
-        console.log(bookingStatus);
-        
-        const insertId =  bookingStatus[0].value[0].insertId;
-        const bookingDetails = await db.query(queries.fetchBookedTicket,[insertId]);
-
-        if(!bookingDetails || bookingDetails.length ===0){
+        if(!bookingDetails || bookingDetails[0].length === 0){
+            await connection.rollback();
+            connection.release();
             return{
-                status:404,
-                message:"No ticket found"
+                status: 404,
+                message: "No ticket found"
             }
         }
 
+        // commit transaction
+        await connection.commit();
+        connection.release();
+
         return {
-            status:201,
-            message:"Ticket Booked Successfully!",
-            data:bookingDetails[0][0]
+            status: 201,
+            message: "Ticket Booked Successfully!",
+            data: bookingDetails[0][0]
         }
 
     } catch (error) {
-               return {
+        // rollback on error
+        await connection.rollback();
+        connection.release();
+        
+        return {
             status: 500,
             message: "Something went wrong",
             error: error
