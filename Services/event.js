@@ -274,8 +274,8 @@ module.exports.bookTicket = async(userId, payload) => {
         const ticketNo = generateTicketNo();
 
         const bookingStatus = await Promise.allSettled([
-            await connection.query(queries.bookTicket, [ticketNo, userId, eventId, noOfTicket]),
-            await connection.query(queries.updateTicketCount, [availableTickets, eventId])
+            connection.query(queries.bookTicket, [ticketNo, userId, eventId, noOfTicket]),
+            connection.query(queries.updateTicketCount, [availableTickets, eventId])
         ]);
   
         const insertId = bookingStatus[0].value[0].insertId;
